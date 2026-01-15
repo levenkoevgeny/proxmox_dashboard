@@ -1,6 +1,5 @@
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import requests
-import json
 
 from django.shortcuts import render
 from .models import PM
