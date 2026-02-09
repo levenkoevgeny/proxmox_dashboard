@@ -1,0 +1,76 @@
+name: Build and push Docker image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get latest release version
+        id: get_version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const { data: releases } = await github.rest.repos.listReleases({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+              
+              if (releases.length > 0) {
+                const latestRelease = releases[0];
+                const currentVersion = latestRelease.tag_name.replace(/^v/, '');
+                console.log(`Latest release version: ${currentVersion}`);
+                
+                // Increment patch version
+                const versionParts = currentVersion.split('.').map(Number);
+                const newVersion = `${versionParts[0]}.${versionParts[1]}.${versionParts[2] + 1}`;
+                console.log(`New version: ${newVersion}`);
+                
+                core.setOutput('current_version', currentVersion);
+                core.setOutput('new_version', newVersion);
+              } else {
+                // First release
+                console.log('No existing releases found, starting with 1.0.0');
+                core.setOutput('current_version', '0.0.0');
+                core.setOutput('new_version', '1.0.0');
+              }
+            } catch (error) {
+              console.log('Error getting releases, starting with 1.0.0');
+              core.setOutput('current_version', '0.0.0');
+              core.setOutput('new_version', '1.0.0');
+            }
+
+      - name: Create new release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.new_version }}
+          release_name: Release v${{ steps.get_version.outputs.new_version }}
+          body: |
+            Automated release from GitHub Actions
+            - Commit: ${{ github.sha }}
+            - Date: ${{ github.event.head_commit.timestamp }}
+          draft: false
+          prerelease: false
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: |
+            ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+            ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:${{ steps.get_version.outputs.new_version  }}
