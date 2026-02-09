@@ -17,15 +17,12 @@
                                               target="_blank">{{ node.node_name }} ({{ node.node_ip_address }})</a></h5>
                 </div>
                 <div class="card-body">
-
                 {% if node.lxc_list %}
                 	<p class="fw-bold">Контейнеры</p>
                 {% endif %}
-
                     <ul class="list-group list-group-flush">
-
                         {% for lxc in node.lxc_list %}
-                            {% if vm.status == 'running' %}
+                            {% if lxc.status == 'running' %}
                                 <li class="list-group-item">
                                     <div class="d-flex flex-row nowrap align-items-center">
                                         <span style="color: #006b1b; font-size: 40px">&#x2022;</span>
