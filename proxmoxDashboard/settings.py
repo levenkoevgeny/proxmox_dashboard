@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-ioa8^xti^7jo(%vr*3%qi(&-@cu35vjjjs24dtywm9r_31t))3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*", "pms.amvd.by"]
+ALLOWED_HOSTS = ["*"]
+
+CSRF_TRUSTED_ORIGINS = ["pms.amvd.by"]
 
 INTERNAL_IPS = [
     "127.0.0.1",
