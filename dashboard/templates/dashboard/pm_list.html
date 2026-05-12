@@ -1,3 +1,4 @@
+{% load mathfilters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,11 +16,23 @@
                 <div class="card-header">
                     <h5 class="card-title"><a href="https://{{ node.node_ip_address }}:8006"
                                               target="_blank">{{ node.node_name }} ({{ node.node_ip_address }})</a></h5>
+                    <h5>Proxmox - {{ node.node_version.version }}</h5>
+                    <div>
+                        <h3>Memory</h3>
+                        Total - <b>{{ node.node_status.memory.total|div:1073741824|floatformat:"0" }} Gb</b><br>
+                        Used - <b>{{ node.node_status.memory.used|div:1073741824|floatformat:"0" }} Gb</b><br>
+                        Free - <b>{{ node.node_status.memory.free|div:1073741824|floatformat:"0" }} Gb</b><br>
+                        <h3>CPU</h3>
+                        Model - <b>{{ node.node_status.cpuinfo.model }}</b><br>
+                        Sockets - <b>{{ node.node_status.cpuinfo.sockets }}</b><br>
+                        CPUs - <b>{{ node.node_status.cpuinfo.cpus }}</b><br>
+                    </div>
                 </div>
+
                 <div class="card-body">
-                {% if node.lxc_list %}
-                	<p class="fw-bold">Контейнеры</p>
-                {% endif %}
+                    {% if node.lxc_list %}
+                        <p class="fw-bold">Контейнеры</p>
+                    {% endif %}
                     <ul class="list-group list-group-flush">
                         {% for lxc in node.lxc_list %}
                             {% if lxc.status == 'running' %}
@@ -42,9 +55,9 @@
                         {% endfor %}
                     </ul>
 
-                   {% if node.vm_list %}
-                	<p class="fw-bold">Машины</p>
-                {% endif %}
+                    {% if node.vm_list %}
+                        <p class="fw-bold">Машины</p>
+                    {% endif %}
                     <ul class="list-group list-group-flush">
                         {% for vm in node.vm_list %}
                             {% if vm.status == 'running' %}

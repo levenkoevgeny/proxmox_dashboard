@@ -17,9 +17,18 @@ def pm_list(request):
             r_lxc = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/lxc/', headers={
                 'Authorization': f'PVEAPIToken={node.pm_token}'}, verify=False)
 
+            r_status = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/status/', headers={
+                'Authorization': f'PVEAPIToken={node.pm_token}'}, verify=False)
+
+            r_version = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/version/',
+                                    headers={
+                                        'Authorization': f'PVEAPIToken={node.pm_token}'}, verify=False)
+
             nodes.append({
                 'node_name': node.pm_name,
                 'node_ip_address': node.pm_ip_address,
+                'node_status': r_status.json()['data'],
+                'node_version': r_version.json()['data'],
                 'vm_list': r.json()['data'],
                 'lxc_list': r_lxc.json()['data']
             })

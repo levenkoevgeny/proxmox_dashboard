@@ -2,6 +2,7 @@ asgiref==3.11.0
 certifi==2026.1.4
 charset-normalizer==3.4.4
 Django==5.2.10
+django-mathfilters==1.0.0
 idna==3.11
 psycopg==3.3.2
 psycopg-binary==3.3.2
