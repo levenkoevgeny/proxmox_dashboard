@@ -9,7 +9,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def pm_list(request):
     nodes = []
-    pm_nodes = PM.objects.all().order_by('pm_name')
+    pm_nodes = PM.objects.all().order_by('pm_order_number')
     for node in pm_nodes:
         try:
             r = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/qemu/', headers={

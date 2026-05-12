@@ -3,6 +3,7 @@ from django.db import models
 
 class PM(models.Model):
     pm_name = models.CharField(max_length=100, verbose_name="Proxmox nodename")
+    pm_order_number = models.IntegerField(verbose_name="Proxmox order number", blank=True, null=True)
     pm_ip_address = models.CharField(max_length=100, verbose_name="Proxmox ip address", blank=True, null=True)
     pm_token = models.CharField(max_length=255, verbose_name="Proxmox token", blank=True, null=True)
 
