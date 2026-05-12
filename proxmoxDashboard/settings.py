@@ -84,14 +84,14 @@ WSGI_APPLICATION = 'proxmoxDashboard.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES_ = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-DATABASES = {
+DATABASES_ = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "HOST": os.getenv('DB_HOST'),
