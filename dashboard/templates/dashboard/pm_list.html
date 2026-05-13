@@ -5,87 +5,366 @@
 <head>
     <meta charset="UTF-8">
     <title>PMS</title>
-    <link rel="shortcut icon" href="{% static 'dashboard/img/favicon.ico' %}" />
+    <link rel="shortcut icon" href="{% static 'dashboard/img/favicon.ico' %}"/>
 
     <link rel="stylesheet" href="{% static 'dashboard/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard/css/bootstrap-icons.css' %}">
+    <style>
+        body {
+            background: #0f111a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .card {
+            background: #1a1d2b;
+            border: 1px solid #2a2d3e;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-header {
+            background: #232736;
+            border-bottom: 1px solid #2a2d3e;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .card-title a {
+            color: #6ea8fe;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .card-title a:hover {
+            color: #9ac0ff;
+            text-decoration: underline;
+        }
+
+        .card-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .section-title {
+            color: #adb5bd;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 1.2rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #2a2d3e;
+            padding-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            font-size: 1rem;
+        }
+
+        .list-group-item {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 0;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+
+        .list-group-item .status-dot {
+            font-size: 18px;
+            margin-right: 10px;
+            line-height: 1;
+        }
+
+        .status-on {
+            color: #2dce89;
+        }
+
+        .status-off {
+            color: #6c757d;
+        }
+
+        .status-on .status-dot {
+            color: #2dce89;
+        }
+
+        .status-off .status-dot {
+            color: #6c757d;
+        }
+
+        .status-off .vm-name {
+            color: #888;
+        }
+
+        .stat-block {
+            background: #232736;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+        }
+
+        .stat-block h5 {
+            font-size: 0.9rem;
+            color: #adb5bd;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .progress-custom {
+            height: 8px;
+            background: #2a2d3e;
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        .progress-custom .progress-bar {
+            border-radius: 4px;
+            /* Базовый цвет будет переопределён в JavaScript */
+        }
+
+        .hostname {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .proxmox-version {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .ip-address {
+            color: #6c757d;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        .card-footer {
+            background: #1a1d2b;
+            border-top: 1px solid #2a2d3e;
+            border-radius: 0 0 16px 16px !important;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        @media (max-width: 992px) {
+            .d-flex.flex-row {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .card {
+                width: 100% !important;
+                max-width: 340px;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <div class="my-3"></div>
-    <div class="d-flex flex-row flex-wrap">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0"><i class="bi bi-server me-2"></i>Proxmox Monitoring</h1>
+
+    </div>
+
+    <div id="cardsContainer" class="d-flex flex-row flex-wrap justify-content-center gap-3">
         {% for node in nodes %}
-            <div class="card m-2" style="width: 18rem;">
+            <div class="card" style="width: 20rem;">
                 <div class="card-header">
-                    <h5 class="card-title"><a href="https://{{ node.node_ip_address }}:8006"
-                                              target="_blank">{{ node.node_name }} ({{ node.node_ip_address }})</a></h5>
-                    <h5>Proxmox - {{ node.node_version.version }}</h5>
-                    <div>
-                        <h3>Memory</h3>
-                        Total - <b>{{ node.node_status.memory.total|div:1073741824|floatformat:"0" }} Gb</b><br>
-                        Used - <b>{{ node.node_status.memory.used|div:1073741824|floatformat:"0" }} Gb</b><br>
-                        Free - <b>{{ node.node_status.memory.free|div:1073741824|floatformat:"0" }} Gb</b><br>
-                        <h3>CPU</h3>
-                        Model - <b>{{ node.node_status.cpuinfo.model }}</b><br>
-                        Sockets - <b>{{ node.node_status.cpuinfo.sockets }}</b><br>
-                        CPUs - <b>{{ node.node_status.cpuinfo.cpus }}</b><br>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="hostname"><a href="https://{{ node.node_ip_address }}:8006"
+                                                     target="_blank">{{ node.node_name }}</a></div>
+                            <div class="ip-address">{{ node.node_ip_address }}</div>
+                            <div class="proxmox-version">Proxmox - {{ node.node_version.version }}</div>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">Online</span>
                     </div>
                 </div>
-
                 <div class="card-body">
+                    <!-- Memory -->
+                    <div class="stat-block">
+                        <div class="d-flex justify-content-between">
+                            <h5><i class="bi bi-memory me-1"></i> Memory</h5>
+
+                            <span class="stat-value"
+                                  style="color: {{ node.node_status.memory.color }}">{{ node.node_status.memory.used|div:1073741824|floatformat:"0" }} / {{ node.node_status.memory.total|div:1073741824|floatformat:"0" }} GB</span>
+                        </div>
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             style="width: {{ node.node_status.memory.persent }}%; background-color: {{ node.node_status.memory.color }}; height: 10px;"
+                             aria-valuenow="{{ node.node_status.memory.persent }}" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+
+                    </div>
+
+                    <!-- CPU -->
+                    <div class="stat-block">
+                        <div class="d-flex justify-content-between">
+                            <h5><i class="bi bi-cpu me-1"></i> CPU</h5>
+                            <span class="stat-value">{{ node.node_status.cpuinfo.cpus }} Cores</span>
+                        </div>
+                        <div class="small text-white-50">{{ node.node_status.cpuinfo.model }}</div>
+                        <div class="small text-white-50">{{ node.node_status.cpuinfo.sockets }} Sockets</div>
+                    </div>
+
+
                     {% if node.lxc_list %}
-                        <p class="fw-bold">Контейнеры</p>
+                        <div class="section-title">
+                            <i class="bi bi-box"></i> Контейнеры
+                        </div>
                     {% endif %}
                     <ul class="list-group list-group-flush">
                         {% for lxc in node.lxc_list %}
                             {% if lxc.status == 'running' %}
-                                <li class="list-group-item">
-                                    <div class="d-flex flex-row nowrap align-items-center">
-                                        <span style="color: #006b1b; font-size: 40px">&#x2022;</span>
-                                        <p class=" mx-1 card-text nowrap">{{ lxc.vmid }} - {{ lxc.name }}</p>
-                                    </div>
+                                <li class="list-group-item status-on">
+                                    <span class="status-dot">●</span>
+                                    <span class="vm-name">{{ lxc.vmid }} - {{ lxc.name }}</span>
                                 </li>
-
                             {% else %}
-                                <li class="list-group-item" style="color: #888888;">
-                                    <div class="d-flex flex-row nowrap align-items-center">
-
-                                        <span style="font-size: 40px">&#x2022;</span>
-                                        <p class=" mx-1 card-text nowrap">{{ lxc.vmid }} - {{ lxc.name }}</p>
-                                    </div>
+                                <li class="list-group-item status-off">
+                                    <span class="status-dot">●</span>
+                                    <span class="vm-name">{{ lxc.vmid }} - {{ lxc.name }}</span>
                                 </li>
                             {% endif %}
                         {% endfor %}
                     </ul>
 
+
                     {% if node.vm_list %}
-                        <p class="fw-bold">Машины</p>
+                        <div class="section-title">
+                            <i class="bi bi-pc-display-horizontal"></i> Машины
+                        </div>
                     {% endif %}
+
                     <ul class="list-group list-group-flush">
                         {% for vm in node.vm_list %}
                             {% if vm.status == 'running' %}
-                                <li class="list-group-item">
-                                    <div class="d-flex flex-row nowrap align-items-center">
-                                        <span style="color: #006b1b; font-size: 40px">&#x2022;</span>
-                                        <p class=" mx-1 card-text nowrap">{{ vm.vmid }} - {{ vm.name }}</p>
-                                    </div>
+                                <li class="list-group-item status-on">
+                                    <span class="status-dot">●</span>
+                                    <span class="vm-name">{{ vm.vmid }} - {{ vm.name }}</span>
                                 </li>
-
                             {% else %}
-                                <li class="list-group-item" style="color: #888888;">
-                                    <div class="d-flex flex-row nowrap align-items-center">
-
-                                        <span style="font-size: 40px">&#x2022;</span>
-                                        <p class=" mx-1 card-text nowrap">{{ vm.vmid }} - {{ vm.name }}</p>
-                                    </div>
+                                <li class="list-group-item status-off">
+                                    <span class="status-dot">●</span>
+                                    <span class="vm-name">{{ vm.vmid }} - {{ vm.name }}</span>
                                 </li>
                             {% endif %}
+
+
+
                         {% endfor %}
                     </ul>
+
+
+                </div>
+                <div class="card-footer text-center">
+                    Всего: {{ node.lxc_list|length }} контейнеров, {{ node.vm_list|length }} машин
                 </div>
             </div>
 
+
+
+
+
+
+
+
+
+
+            {#            <div class="card m-2" style="width: 18rem;">#}
+            {#                <div class="card-header">#}
+            {#                    <h5 class="card-title"><a href="https://{{ node.node_ip_address }}:8006"#}
+            {#                                              target="_blank">{{ node.node_name }} ({{ node.node_ip_address }})</a></h5>#}
+            {#                    <h5>Proxmox - {{ node.node_version.version }}</h5>#}
+            {#                    <div>#}
+            {#                        <h3>Memory</h3>#}
+            {#                        Total - <b>{{ node.node_status.memory.total|div:1073741824|floatformat:"0" }} Gb</b><br>#}
+            {#                        Used - <b>{{ node.node_status.memory.used|div:1073741824|floatformat:"0" }} Gb</b><br>#}
+            {#                        Free - <b>{{ node.node_status.memory.free|div:1073741824|floatformat:"0" }} Gb</b><br>#}
+            {#                        <h3>CPU</h3>#}
+            {#                        Model - <b>{{ node.node_status.cpuinfo.model }}</b><br>#}
+            {#                        Sockets - <b>{{ node.node_status.cpuinfo.sockets }}</b><br>#}
+            {#                        CPUs - <b>{{ node.node_status.cpuinfo.cpus }}</b><br>#}
+            {#                    </div>#}
+            {#                </div>#}
+            {##}
+            {#                <div class="card-body">#}
+            {#                    {% if node.lxc_list %}#}
+            {#                        <p class="fw-bold">Контейнеры</p>#}
+            {#                    {% endif %}#}
+            {#                    <ul class="list-group list-group-flush">#}
+            {#                        {% for lxc in node.lxc_list %}#}
+            {#                            {% if lxc.status == 'running' %}#}
+            {#                                <li class="list-group-item">#}
+            {#                                    <div class="d-flex flex-row nowrap align-items-center">#}
+            {#                                        <span style="color: #006b1b; font-size: 40px">&#x2022;</span>#}
+            {#                                        <p class=" mx-1 card-text nowrap">{{ lxc.vmid }} - {{ lxc.name }}</p>#}
+            {#                                    </div>#}
+            {#                                </li>#}
+            {##}
+            {#                            {% else %}#}
+            {#                                <li class="list-group-item" style="color: #888888;">#}
+            {#                                    <div class="d-flex flex-row nowrap align-items-center">#}
+            {##}
+            {#                                        <span style="font-size: 40px">&#x2022;</span>#}
+            {#                                        <p class=" mx-1 card-text nowrap">{{ lxc.vmid }} - {{ lxc.name }}</p>#}
+            {#                                    </div>#}
+            {#                                </li>#}
+            {#                            {% endif %}#}
+            {#                        {% endfor %}#}
+            {#                    </ul>#}
+            {##}
+            {#                    {% if node.vm_list %}#}
+            {#                        <p class="fw-bold">Машины</p>#}
+            {#                    {% endif %}#}
+            {#                    <ul class="list-group list-group-flush">#}
+            {#                        {% for vm in node.vm_list %}#}
+            {#                            {% if vm.status == 'running' %}#}
+            {#                                <li class="list-group-item">#}
+            {#                                    <div class="d-flex flex-row nowrap align-items-center">#}
+            {#                                        <span style="color: #006b1b; font-size: 40px">&#x2022;</span>#}
+            {#                                        <p class=" mx-1 card-text nowrap">{{ vm.vmid }} - {{ vm.name }}</p>#}
+            {#                                    </div>#}
+            {#                                </li>#}
+            {##}
+            {#                            {% else %}#}
+            {#                                <li class="list-group-item" style="color: #888888;">#}
+            {#                                    <div class="d-flex flex-row nowrap align-items-center">#}
+            {##}
+            {#                                        <span style="font-size: 40px">&#x2022;</span>#}
+            {#                                        <p class=" mx-1 card-text nowrap">{{ vm.vmid }} - {{ vm.name }}</p>#}
+            {#                                    </div>#}
+            {#                                </li>#}
+            {#                            {% endif %}#}
+            {#                        {% endfor %}#}
+            {#                    </ul>#}
+            {#                </div>#}
+            {#            </div>#}
+
         {% endfor %}
     </div>
+
+
 </div>
 
 

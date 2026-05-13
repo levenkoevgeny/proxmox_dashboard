@@ -7,6 +7,15 @@ from .models import PM
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
+def get_memory_color(percent):
+    if percent >= 90:
+        return '#dc3545'
+    elif percent >= 70:
+        return '#ffc107'
+    else:
+        return '#6ea8fe'
+
+
 def pm_list(request):
     nodes = []
     pm_nodes = PM.objects.all().order_by('pm_order_number')
@@ -17,20 +26,28 @@ def pm_list(request):
             r_lxc = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/lxc/', headers={
                 'Authorization': f'PVEAPIToken={node.pm_token}'}, verify=False)
 
-            r_status = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/status/', headers={
-                'Authorization': f'PVEAPIToken={node.pm_token}'}, verify=False)
-
-            r_version = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/version/',
+            r_status = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/status/',
                                     headers={
                                         'Authorization': f'PVEAPIToken={node.pm_token}'}, verify=False)
+
+            r_version = requests.get(f'https://{node.pm_ip_address}:8006/api2/json/nodes/{node.pm_name}/version/',
+                                     headers={
+                                         'Authorization': f'PVEAPIToken={node.pm_token}'}, verify=False)
+
+            status_data = r_status.json()['data']
+            version_data = r_version.json()['data']
+            status_data['memory']['persent'] = round(
+                status_data['memory']['used'] / status_data['memory']['total'] * 100)
+
+            status_data['memory']['color'] = get_memory_color(status_data['memory']['persent'])
 
             nodes.append({
                 'node_name': node.pm_name,
                 'node_ip_address': node.pm_ip_address,
-                'node_status': r_status.json()['data'],
-                'node_version': r_version.json()['data'],
-                'vm_list': r.json()['data'],
-                'lxc_list': r_lxc.json()['data']
+                'node_status': status_data,
+                'node_version': version_data,
+                'vm_list': sorted(r.json()['data'], key=lambda k: k['vmid']),
+                'lxc_list': sorted(r_lxc.json()['data'], key=lambda k: k['vmid'])
             })
         except:
             pass
