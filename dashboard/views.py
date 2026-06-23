@@ -1,7 +1,8 @@
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import requests
-
+from django.http import HttpResponse
 from django.shortcuts import render
+
 from .models import PM
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -52,3 +53,9 @@ def pm_list(request):
         except:
             pass
     return render(request, "dashboard/pm_list.html", {'nodes': nodes})
+
+
+def health_check(request):
+    pm_list = PM.objects.all()
+    print(pm_list)
+    return HttpResponse("Health status is OK!", status=200)
